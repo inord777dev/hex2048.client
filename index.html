@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hexogonal 2048!</title>
+    <link href="css/styles.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div id="root">
+        <div class="main">
+            <div class="css-yu85dt">
+                <dl class="css-3tf1l4">
+                    RNG-server url
+                    <select id="url-server">
+                        <option id="localhost" value="http://localhost:13337">http://localhost:13337</option>
+                        <option id="server" value="//68f02c80-3bed-4e10-a747-4ff774ae905a.pub.instances.scw.cloud">//68f02c80-3bed-4e10-a747-4ff774ae905a.pub.instances.scw.cloud</option>
+                    </select>
+                </dl>
+                <dl class="css-3tf1l4">
+                    <dt>Select radius </dt>
+                    <dd>
+                        <button class="css-1sg1t87">2</button>
+                        <button class="css-1sg1t87">3</button>
+                        <button class="css-1sg1t87">4</button>
+                    </dd>
+                </dl>
+            </div>
+            <div class="css-1rx1arh">
+                <div class="css-3tf1l4">Game Status: <span data-status="round-select">round-select</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/hex2048.js"></script>
+</body>
+</html>
