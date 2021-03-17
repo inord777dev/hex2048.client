@@ -3,33 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hexogonal 2048!</title>
+    <title>Hexogonal matrix 2048!</title>
     <link href="./css/style.css" rel="stylesheet" type="text/css">
+    <link href="./css/bootstrap.min.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-    <div id="root">
-        <main>
-            <div class="menu">
-                <dl class="block1">
-                    Sorce url
-                    <select id="url-server">
-                        <option id="remote" value="//68f02c80-3bed-4e10-a747-4ff774ae905a.pub.instances.scw.cloud">Remote server</option>
-                        <option id="localhost" value="http://localhost:13337/">Local server</option>
-                    </select>
-                </dl>
-                <dl class="block1">
-                    <dt>Select radius </dt>
-                    <dd>
-                        <button class="css-1sg1t87">2</button>
-                    </dd>
-                </dl>
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md">
+                Server url:
+                <select id="url-server">
+                    <option id="remote" value="//68f02c80-3bed-4e10-a747-4ff774ae905a.pub.instances.scw.cloud">Remote server</option>
+                    <option id="localhost" value="http://localhost:13337/">Local server</option>
+                </select>
             </div>
-            <div class="block1">
-                <div class="css-block1">Game Status: <span data-status="round-select">round-select</span>
-                </div>
+        </div>
+        <div class="row text-center">
+            <div class="col-md">
+                <div id="keys">Keys for move: q, w, e, a, s, d</div>
             </div>
-        </main>
+        </div>
+        <div class="row text-center">
+            <div class="col-md">
+                <div id="status">Game Status: <span data-status="playing">press go!</span></div>
+            </div>
+        </div>
+        <div class="row text-center">
+            <div class="col-md">
+                <button id="button_go" class="btn btn-outline-primary">Go!</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md">
+                <div id="games"></div>
+            </div>
+        </div>
     </div>
-    <script src="./js/scripts.js"></script>
+    <script src="./js/jquery-3.6.0.min.js" type="text/javascript"></script>
+    <script src="./js/scripts.js" type="text/javascript"></script>
 </body>
 </html>
