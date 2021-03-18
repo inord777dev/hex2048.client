@@ -40,8 +40,10 @@ function start_game(){
         dataType: "json",
         data: "[]",
         success: function(response) {
-            response.forEach(element => {
-                $(`[data-x=${element.i}][data-y=${element.y}][data-z=${element.z}]`).data("value", element.value);
+            response.forEach(data => {
+                var  element = $(`[data-x=${data.x}][data-y=${data.y}][data-z=${data.z}]`);
+                element.data("value", data.value);
+                element.find(".span_hex").text(data.value);
             });
             $("[data-status]").text(game_status.start);
         },
@@ -69,7 +71,8 @@ $(function(){
     // }
     // alert(points);
 
-    //console.log($('[data-x="${element.x}"][data-y="${element.y}"][data-z="${element.z}"]').length);
+    console.log($(`[data-x=${0}][data-y=${0}][data-z=${0}]`).find(".span_hex").length);
+
     center_game();
     $(window).resize(function() {
         center_game();
