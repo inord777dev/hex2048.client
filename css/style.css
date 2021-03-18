@@ -6,7 +6,7 @@ html, body {
 }
 
 .row{
-    margin-top: 20px;
+    margin-top: 2px;
 }
 
 .svg_hex{
@@ -21,13 +21,13 @@ html, body {
 
 .div_hex{
     position: absolute;
-    transform: translateX(-50%);
 }
 
 .span_hex{
+    font-size: xx-large;
     color: red;
     position: absolute;
-    left: 100px;
-    top: 75px;
+    left: 95px;
+    top: 60px;
 }
 

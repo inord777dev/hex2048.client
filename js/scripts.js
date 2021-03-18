@@ -1,27 +1,10 @@
-var game_status = {start:"playing", finish:"game-over", fail:"server-fail"};
-var position = [
-    {x:225, y:255},
-    {x:225, y:50},
-    {x:375, y:138},
-    {x:375, y:314},
-    {x:225, y:400},
-    {x:75, y:314},
-    {x:75, y:138},
-];
-var data = [null];
+var game_status = 0; 
 
-function cube_to_axial(cube){
-    var q = cube.x
-    var r = cube.z
-    return Hex(q, r)
-}
+//{finish:"game-over";
 
-function axial_to_cube(hex){
-    var x = hex.q;
-    var z = hex.r
-    var y = -x-z
-    return new Cube(x, y, z)
-}
+var game_data = [[null, { x:0, y:-1, z:-1, value:0 }, { x:0, y:1, z:-1, value:0 }],
+    [{ x:-1, y:1, z:0, value:0 }, { x:0, y:0, z:0, value:0 }, { x:1, y:0, z:-1, value:0 }],
+    [{ x:0, y:-1, z:1, value:0 }, { x:1, y:-1, z:0, value:0 }, null]];
 
 function pointy_hex_corner(center, size, i){
     var angle_deg = 60 * i - 30;
@@ -32,7 +15,26 @@ function pointy_hex_corner(center, size, i){
     }
 }
 
+function cell_update(cell) {
+    let div = $(`[data-x=${cell.x}][data-y=${cell.y}][data-z=${cell.z}]`);
+    div.data("value", cell.value);
+    div.find(".span_hex").text(cell.value === 0 ? "" : cell.value);
+}
+
 function start_game(){
+    if (game_status != 0){
+        game_status = 0;
+        for (let i = 0; i < 3; i++){
+            for (let j = 0; j < 3; j++){
+                let data_item = game_data[i][j];
+                if (data_item != null) {
+                    game_data[i][j].value = 0;
+                    cell_update(game_data[i][j]);
+                }
+            }
+        }
+    }
+
     var selected_server = $("option:selected").val();
     $.ajax({
         type: "POST",
@@ -40,26 +42,36 @@ function start_game(){
         dataType: "json",
         data: "[]",
         success: function(response) {
-            response.forEach(data => {
-                var  element = $(`[data-x=${data.x}][data-y=${data.y}][data-z=${data.z}]`);
-                element.data("value", data.value);
-                element.find(".span_hex").text(data.value);
+            response.forEach(el => {
+                for (let i = 0; i < 3; i++){
+                    for (let j = 0; j < 3; j++){
+                        let game_data_item = game_data[i][j];
+                        if (game_data_item != null && game_data_item.x == el.x && game_data_item.y == el.y && game_data_item.z == el.z){
+                            game_data_item.value = el.value;
+                        }
+                    }
+                }
+                cell_update(el);
             });
-            $("[data-status]").text(game_status.start);
+            $("[data-status]").text("playing");
+            game_status = 1;
         },
         error: function(xhr, ajaxOptions, thrownError) {
-            $("[data-status]").text(thrownError);
+            game_status = 0;
+            $("[data-status]").text("server-fail");
         }
      });
 }
 
 function center_game(){
+    var position = [{x:225, y:255},{x:225, y:50},{x:375, y:138},{x:375, y:314},{x:225, y:400},{x:75, y:314},{x:75, y:138}];
     var width = $(window).width()/2;
     var offset = $("#game").offset();
     $(".div_hex").offset(function(i,val){
-          return { top:val.top, left:width - position[i].x + 240/2 };
+          return { top:val.top, left:width - position[i].x + 260/2 };
     });
 }
+
 
 $(function(){
     // let points = "";
@@ -83,30 +95,43 @@ $(function(){
         start_game();
     });
     $(document).keyup(function(e) {
-        switch  (e.keyCode) {
-            case 81 : {
-                console.log("q");
-                break;
-            }
-            case 87 : {
-                console.log("w");
-                break;
-            }
-            case 69 : {
-                console.log("e");
-                break;
-            }
-            case 65 : {
-                console.log("a");
-                break;
-            }
-            case 83 : {
-                console.log("s");
-                break;
-            }
-            case 68 : {
-                console.log("d");
-                break;
+        if (game_status === 1 ) {
+            switch (e.keyCode) {
+                case 81 : {
+                    console.log("q");
+
+                    break;
+                }
+                case 87 : {
+                    console.log("w");
+                    for (let i = 0; i < 3; i++){
+                        for (let j = 0; j < 3; j++){
+                            let game_data_item = game_data[i][j];
+                            if (game_data_item != null && i == 0 && j == 2 ){
+                                game_data_item.value +=1;
+                                console.log(game_data_item.x + " " + game_data_item.y + " " + game_data_item.z);
+                                cell_update(game_data_item);
+                            }
+                        }
+                    }
+                    break;
+                }
+                case 69 : {
+                    console.log("e");
+                    break;
+                }
+                case 65 : {
+                    console.log("a");
+                    break;
+                }
+                case 83 : {
+                    console.log("s");
+                    break;
+                }
+                case 68 : {
+                    console.log("d");
+                    break;
+                }
             }
         }
     });
