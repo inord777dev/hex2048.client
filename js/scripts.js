@@ -70,11 +70,12 @@ $(function(){
     //     points += Math.round(point.x) + " " + Math.round(point.y) + ", ";
     // }
     // alert(points);
-
+    
     center_game();
     $(window).resize(function() {
         center_game();
     });
+
     $('#button_go').click(function(){
         start_game();
     });
@@ -109,4 +110,9 @@ $(function(){
             }
         }
     });
+
+    var hash = document.URL.substr(document.URL.indexOf('#')+1) 
+    if (hash === "test2"){
+        start_game();    
+    }
 });
