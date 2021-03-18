@@ -16,10 +16,12 @@ html, body {
 
 #game{
     position: relative;
+    height: 600px;
 }
 
 .div_hex{
     position: absolute;
+    transform: translateX(-50%);
 }
 
 .span_hex{

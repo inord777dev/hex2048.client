@@ -1,4 +1,13 @@
-var game_status = ["playing", "game-over", "server-fail"];
+var game_status = {start:"playing", finish:"game-over", fail:"server-fail"};
+var position = [
+    {x:225, y:255},
+    {x:225, y:50},
+    {x:375, y:138},
+    {x:375, y:314},
+    {x:225, y:400},
+    {x:75, y:314},
+    {x:75, y:138},
+];
 var data = [null];
 
 function cube_to_axial(cube){
@@ -25,8 +34,29 @@ function pointy_hex_corner(center, size, i){
 
 function start_game(){
     var selected_server = $("option:selected").val();
-    $("[data-status]").text(game_status[0]);
-    alert(selected_server);
+    $.ajax({
+        type: "POST",
+        url: selected_server + "2",
+        dataType: "json",
+        data: "[]",
+        success: function(response) {
+            response.forEach(element => {
+                $(`[data-x=${element.i}][data-y=${element.y}][data-z=${element.z}]`).data("value", element.value);
+            });
+            $("[data-status]").text(game_status.start);
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            $("[data-status]").text(thrownError);
+        }
+     });
+}
+
+function center_game(){
+    var width = $(window).width()/2;
+    var offset = $("#game").offset();
+    $(".div_hex").offset(function(i,val){
+          return { top:val.top, left:width - position[i].x + 225/2 };
+    });
 }
 
 $(function(){
@@ -39,8 +69,11 @@ $(function(){
     // }
     // alert(points);
 
-    $('#div_hex').position();
-
+    //console.log($('[data-x="${element.x}"][data-y="${element.y}"][data-z="${element.z}"]').length);
+    center_game();
+    $(window).resize(function() {
+        center_game();
+    });
     $('#button_go').click(function(){
         start_game();
     });
