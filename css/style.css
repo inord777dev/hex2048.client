@@ -8,3 +8,16 @@ html, body {
 .row{
     margin-top: 20px;
 }
+
+.svg_hex{
+    height: 200px;
+    width: 200px;
+}
+
+#game{
+    position: relative;
+}
+
+.div_hex{
+    position: absolute;
+}
