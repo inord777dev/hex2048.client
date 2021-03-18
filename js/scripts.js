@@ -57,7 +57,7 @@ function center_game(){
     var width = $(window).width()/2;
     var offset = $("#game").offset();
     $(".div_hex").offset(function(i,val){
-          return { top:val.top, left:width - position[i].x + 225/2 };
+          return { top:val.top, left:width - position[i].x + 240/2 };
     });
 }
 
