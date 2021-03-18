@@ -71,8 +71,6 @@ $(function(){
     // }
     // alert(points);
 
-    console.log($(`[data-x=${0}][data-y=${0}][data-z=${0}]`).find(".span_hex").length);
-
     center_game();
     $(window).resize(function() {
         center_game();
@@ -82,5 +80,33 @@ $(function(){
     });
     $("select").change(function(){
         start_game();
+    });
+    $(document).keyup(function(e) {
+        switch  (e.keyCode) {
+            case 81 : {
+                console.log("q");
+                break;
+            }
+            case 87 : {
+                console.log("w");
+                break;
+            }
+            case 69 : {
+                console.log("e");
+                break;
+            }
+            case 65 : {
+                console.log("a");
+                break;
+            }
+            case 83 : {
+                console.log("s");
+                break;
+            }
+            case 68 : {
+                console.log("d");
+                break;
+            }
+        }
     });
 });
