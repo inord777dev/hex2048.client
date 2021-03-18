@@ -21,3 +21,11 @@ html, body {
 .div_hex{
     position: absolute;
 }
+
+.span_hex{
+    color: red;
+    position: absolute;
+    left: 100px;
+    top: 75px;
+}
+
