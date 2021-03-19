@@ -1,9 +1,9 @@
 var game_status; //0 - stop; 1 - gaming; -1 - game-over; -2 - server-fail;  -3 - pause for POST; -4 - win
 var you_are_win = false;
 
- var game_data = [[null, { x:-1, y:1, z:0, value:0, offset:375}, { x:0, y:1, z:-1, value:0, offset:225 }],
-     [{ x:-1, y:0, z:1, value:0, offset:375 }, { x:0, y:0, z:0, value:0, offset:225 }, { x:1, y:0, z:-1, value:0, offset:75 }],
-     [{ x:0, y:-1, z:1, value:0, offset:225 }, { x:1, y:-1, z:0, value:0, offset:75 }, null]];
+ var game_data = [[null, { x:-1, y:1, z:0, value:0, offset:375, merged:false}, { x:0, y:1, z:-1, value:0, offset:225, merged:false }],
+     [{ x:-1, y:0, z:1, value:0, offset:375, merged:false }, { x:0, y:0, z:0, value:0, offset:225, merged:false }, { x:1, y:0, z:-1, value:0, offset:75, merged:false }],
+     [{ x:0, y:-1, z:1, value:0, offset:225, merged:false }, { x:1, y:-1, z:0, value:0, offset:75, merged:false }, null]];
 
 var colors = [];
 colors.v0 = "#FFFFFF";
@@ -38,7 +38,6 @@ function changeStatus(status) {
         el.text(value);
         el.attr("data-status", value);
     }
-    console.log(status);
 }
 
 function cell_update(cell) {
@@ -134,13 +133,19 @@ function game_over_check() {
     }
 }
 
-function game_calc_down(dif) {
+function game_calc(dif, shift) {
     changeStatus(-3);
-    let hasChanges = false;
-    for (let y = 0; y < 3; y++) {
-        for (let x = 0; x < 3; x++) {
-            hasChanges = game_value_calc(x, y, dif) || hasChanges;
+    for (let y = 0; y <= 2; y++) {
+        for (let x = 0; x <= 2; x++) {
+            let cell = game_data[y][x];
+            if (cell != null) {
+                cell.merged = false;
+            }
         }
+    }
+    let hasChanges = shift(dif);
+    while (shift(dif)){
+
     }
     if (hasChanges) {
         game_request();    
@@ -150,18 +155,23 @@ function game_calc_down(dif) {
 }
 
 function game_calc_up(dif) {
-    changeStatus(-3);
+    let hasChanges;
+    for (let y = 0; y <= 2; y++) {
+        for (let x = 0; x <= 2; x++) {
+            hasChanges = game_value_calc(x, y, dif) || hasChanges;
+        }
+    }
+    return hasChanges;
+}
+
+function game_calc_down(dif) {
     let hasChanges = false;
     for (let y = 2; y >= 0; y--) {
         for (let x = 2; x >= 0; x--) {
             hasChanges = game_value_calc(x, y, dif) || hasChanges;
         }
     }
-    if (hasChanges) {
-        game_request();    
-    } else {
-        changeStatus(1);
-    }
+    return hasChanges;
 }
 
 function game_value_calc(x, y, dif) {
@@ -169,21 +179,20 @@ function game_value_calc(x, y, dif) {
     let hasChange = false;
     let difX = x + dif.x;
     let difY = y + dif.y;
-    if (cell != null && difX >= 0 && difX <= 2 && difY >= 0 && difY <= 2){
+    if (cell != null && difX >= 0 && difX <= 2 && difY >= 0 && difY <= 2) {
         let cell_next = game_data[difY][difX];
         if (cell.value == 0 && cell_next != null && cell_next.value > 0) {
             cell.value = cell_next.value;
             cell_next.value = 0;
             hasChange = true;
-            game_value_calc(difX, difY, dif);
-        } else if (cell.value > 0 && cell_next != null && cell.value == cell_next.value) {
+        } else if (cell.value > 0 && !cell.merged && cell_next != null && cell.value == cell_next.value && !cell_next.merged) {
             cell.value += cell_next.value;
+            cell.merged = true;
             if (cell.value >= 2048) {
                 you_are_win = true;
             }
             cell_next.value = 0;
             hasChange = true;
-            game_value_calc(difX, difY, dif);
         };
         if (hasChange) {
             cell_update(cell);
@@ -233,7 +242,7 @@ function draw_hex() {
 $(function(){
     changeStatus(0); 
 
-    // changeStatus(1); // for selftest - not for realise
+    //changeStatus(1); // for selftest - not for realise
     // for (let i = 0; i < 3; i++){
     //     for (let j = 0; j < 3; j++){
     //         let data_item = game_data[i][j];
@@ -256,33 +265,27 @@ $(function(){
         if (game_status == 1 ) {
             switch (e.keyCode) {
                 case 81 : {
-                    console.log("q");
-                    game_calc_up({ x:0, y:1 });
+                    game_calc({ x:0, y:1 }, game_calc_up);
                     break;
                 }
                 case 87 : {
-                    console.log("w");
-                    game_calc_up({ x:-1, y:1 });
+                    game_calc({ x:-1, y:1 }, game_calc_up);
                     break;
                 }
                 case 69 : {
-                    console.log("e");
-                    game_calc_down({ x:-1, y:0 });
+                    game_calc({ x:-1, y:0 }, game_calc_down);
                     break;
                 }
                 case 65 : {
-                    console.log("a");
-                    game_calc_up({ x:1, y:0 });
+                    game_calc({ x:1, y:0 }, game_calc_up);
                     break;
                 }
                 case 83 : {
-                    console.log("s");
-                    game_calc_down({ x:1, y:-1 });
+                    game_calc({ x:1, y:-1 }, game_calc_down);
                     break;
                 }
                 case 68 : {
-                    console.log("d");
-                    game_calc_down({ x:0, y:-1 });
+                    game_calc({ x:0, y:-1 }, game_calc_down);
                     break;
                 }
             }
