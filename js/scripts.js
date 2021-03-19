@@ -239,16 +239,16 @@ function draw_hex() {
 $(function(){
     changeStatus(0); 
 
-    changeStatus(1); // for selftest - remove for realese
-    for (let i = 0; i < 3; i++){
-        for (let j = 0; j < 3; j++){
-            let data_item = game_data[i][j];
-            if (data_item != null) {
-                cell_update(game_data[i][j]);
-            }
-        }
-    }
-    game_over_check();
+    // changeStatus(1); // for selftest - remove for realese
+    // for (let i = 0; i < 3; i++){
+    //     for (let j = 0; j < 3; j++){
+    //         let data_item = game_data[i][j];
+    //         if (data_item != null) {
+    //             cell_update(game_data[i][j]);
+    //         }
+    //     }
+    // }
+
 
     center_game();
     
