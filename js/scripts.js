@@ -24,11 +24,13 @@ function changeStatus(status) {
     let el = $("[data-status]");
     let value;
     if (status == 0) {
-        value = "round-select";
+        value = "press Go!";
     } else if (status == 1) {
         value = "playing";
     } else if (status == -1) {
         value = "game-over";
+    } else if (status == -2) {
+        value = "server-fail";
     } else if (status == -4){
         value = "you are champion!";
     };
@@ -67,6 +69,7 @@ function game_request() {
         data: JSON.stringify(data),
         success: function(response) {
             response.forEach(el => {
+                cell_update(el);
                 for (let i = 0; i < 3; i++) {
                     for (let j = 0; j < 3; j++) {
                         let game_data_item = game_data[i][j];
@@ -75,7 +78,6 @@ function game_request() {
                         }
                     }
                 }
-                cell_update(el);
             });
             game_over_check();
         },
@@ -241,12 +243,6 @@ $(function(){
     //     }
     // }
 
-    center_game();
-    
-    $(window).resize(function() {
-        center_game();
-    });
-
     $('#button_go').click(function(){
         start_game();
     });
@@ -295,6 +291,12 @@ $(function(){
 
     var hash = document.URL.substr(document.URL.indexOf('#') + 1) 
     if (hash === "test2"){
-        start_game();    
+        start_game();   
+    } else {
+        center_game();
+    
+        $(window).resize(function() {
+            center_game();
+        });
     }
 });
