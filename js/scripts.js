@@ -1,4 +1,4 @@
-var game_status = 1; //0 - stop; 1 - gaming; -1 - game-over; -2 - server-fail;  -3 - pause for POST;
+var game_status; //0 - stop; 1 - gaming; -1 - game-over; -2 - server-fail;  -3 - pause for POST;
 
 var game_data = [[null, { x:-1, y:1, z:0, value:0, offset:375}, { x:0, y:1, z:-1, value:2, offset:225 }],
     [{ x:-1, y:0, z:1, value:0, offset:375 }, { x:0, y:0, z:0, value:2, offset:225 }, { x:1, y:0, z:-1, value:0, offset:75 }],
@@ -15,8 +15,10 @@ function changeStatus(status) {
     } else if (status == -1) {
         value = "game-over";
     };
-    el.text(value);
-    el.data("status", value);
+    if (value){
+        el.text(value);
+        el.data("status", value);
+    }
 }
 
 function cell_update(cell) {
@@ -38,7 +40,7 @@ function start_game(){
             }
         }
     }
-
+    changeStatus(-3);
     var selected_server = $("option:selected").val();
     $.ajax({
         type: "POST",
@@ -66,6 +68,7 @@ function start_game(){
 }
 
 function game_calc_up(dif) {
+    changeStatus(-3);
     let hasChanges = false;
     for (let y = 0; y < 3; y++) {
         for (let x = 0; x < 3; x++) {
@@ -74,10 +77,14 @@ function game_calc_up(dif) {
     }
     if (!hasChanges && game_data.every(el => el.value > 0 )) {
         changeStatus(-1);
+    } else {
+        changeStatus(1);
     }
+
 }
 
 function game_calc_down(dif) {
+    changeStatus(-3);
     let hasChanges = false;
     for (let y = 2; y >= 0; y--) {
         for (let x = 2; x >= 0; x--) {
@@ -86,6 +93,8 @@ function game_calc_down(dif) {
     }
     if (!hasChanges && game_data.every(el => el.value > 0 )) {
         changeStatus(-1);
+    } else {
+        changeStatus(1);
     }
 }
 
@@ -154,8 +163,9 @@ function draw_hex() {
 }
 
 $(function(){
-    //changeStatus(0);
-    changeStatus(1);
+    changeStatus(0); 
+
+    changeStatus(1); // for selftest - remove for realese
 
     center_game();
     
