@@ -72,7 +72,7 @@ function game_calc_up(dif) {
             hasChanges = game_value_calc(x, y, dif) || hasChanges;
         }
     }
-    if (!hasChanges) {
+    if (!hasChanges && game_data.every(el => el.value > 0 )) {
         changeStatus(-1);
     }
 }
@@ -84,7 +84,7 @@ function game_calc_down(dif) {
             hasChanges = game_value_calc(x, y, dif) || hasChanges;
         }
     }
-    if (!hasChanges) {
+    if (!hasChanges && game_data.every(el => el.value > 0 )) {
         changeStatus(-1);
     }
 }
@@ -100,10 +100,12 @@ function game_value_calc(x, y, dif) {
             cell.value = cell_next.value;
             cell_next.value = 0;
             hasChange = true;
+            game_value_calc(difX, difY, dif);
         } else if (cell.value > 0 && cell_next != null && cell.value == cell_next.value) {
             cell.value += cell_next.value;
             cell_next.value = 0;
             hasChange = true;
+            game_value_calc(difX, difY, dif);
         };
         if (hasChange) {
             cell_update(cell);
