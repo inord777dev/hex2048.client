@@ -1,8 +1,8 @@
 var game_status; //0 - stop; 1 - gaming; -1 - game-over; -2 - server-fail;  -3 - pause for POST;
 
-var game_data = [[null, { x:-1, y:1, z:0, value:0, offset:375}, { x:0, y:1, z:-1, value:2, offset:225 }],
-    [{ x:-1, y:0, z:1, value:0, offset:375 }, { x:0, y:0, z:0, value:2, offset:225 }, { x:1, y:0, z:-1, value:0, offset:75 }],
-    [{ x:0, y:-1, z:1, value:2, offset:225 }, { x:1, y:-1, z:0, value:0, offset:75 }, null]];
+var game_data = [[null, { x:-1, y:1, z:0, value:0, offset:375}, { x:0, y:1, z:-1, value:0, offset:225 }],
+    [{ x:-1, y:0, z:1, value:0, offset:375 }, { x:0, y:0, z:0, value:0, offset:225 }, { x:1, y:0, z:-1, value:0, offset:75 }],
+    [{ x:0, y:-1, z:1, value:0, offset:225 }, { x:1, y:-1, z:0, value:0, offset:75 }, null]];
 
 function changeStatus(status) {
     game_status = status;
@@ -27,26 +27,25 @@ function cell_update(cell) {
     div.find(".span_hex").text(cell.value === 0 ? "" : cell.value);
 }
 
-function start_game(){
-    if (game_status != 0){
-        game_status = 0;
-        for (let i = 0; i < 3; i++){
-            for (let j = 0; j < 3; j++){
-                let data_item = game_data[i][j];
-                if (data_item != null) {
-                    game_data[i][j].value = 0;
-                    cell_update(game_data[i][j]);
-                }
+function game_request() {
+    changeStatus(-3);
+    let data = [];
+
+    for (let i = 0; i < 3; i++){
+        for (let j = 0; j < 3; j++){
+            let item = game_data[i][j];
+            if (item != null && item.value > 0) {
+                data.push(item);
             }
         }
     }
-    changeStatus(-3);
+
     var selected_server = $("option:selected").val();
     $.ajax({
         type: "POST",
         url: selected_server + "2",
         dataType: "json",
-        data: "[]",
+        data: JSON.stringify(data),
         success: function(response) {
             response.forEach(el => {
                 for (let i = 0; i < 3; i++){
@@ -65,6 +64,23 @@ function start_game(){
             changeStatus(-2);
         }
      });
+   
+}
+
+function start_game(){
+    if (game_status != 0){
+        game_status = 0;
+        for (let i = 0; i < 3; i++){
+            for (let j = 0; j < 3; j++){
+                let data_item = game_data[i][j];
+                if (data_item != null) {
+                    game_data[i][j].value = 0;
+                    cell_update(game_data[i][j]);
+                }
+            }
+        }
+    }
+    game_request();
 }
 
 function game_calc_up(dif) {
@@ -75,6 +91,7 @@ function game_calc_up(dif) {
             hasChanges = game_value_calc(x, y, dif) || hasChanges;
         }
     }
+    game_request();
     if (!hasChanges && game_data.every(el => el.value > 0 )) {
         changeStatus(-1);
     } else {
@@ -91,6 +108,7 @@ function game_calc_down(dif) {
             hasChanges = game_value_calc(x, y, dif) || hasChanges;
         }
     }
+    game_request();
     if (!hasChanges && game_data.every(el => el.value > 0 )) {
         changeStatus(-1);
     } else {
