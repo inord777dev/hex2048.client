@@ -1,17 +1,17 @@
 var game_status; //0 - stop; 1 - gaming; -1 - game-over; -2 - server-fail;  -3 - pause for POST; -4 - win
 var you_are_win = false;
 
-// var game_data = [[null, { x:-1, y:1, z:0, value:0, offset:375}, { x:0, y:1, z:-1, value:0, offset:225 }],
-//     [{ x:-1, y:0, z:1, value:0, offset:375 }, { x:0, y:0, z:0, value:0, offset:225 }, { x:1, y:0, z:-1, value:0, offset:75 }],
-//     [{ x:0, y:-1, z:1, value:0, offset:225 }, { x:1, y:-1, z:0, value:0, offset:75 }, null]];
+ var game_data = [[null, { x:-1, y:1, z:0, value:0, offset:375}, { x:0, y:1, z:-1, value:0, offset:225 }],
+     [{ x:-1, y:0, z:1, value:0, offset:375 }, { x:0, y:0, z:0, value:0, offset:225 }, { x:1, y:0, z:-1, value:0, offset:75 }],
+     [{ x:0, y:-1, z:1, value:0, offset:225 }, { x:1, y:-1, z:0, value:0, offset:75 }, null]];
 
 // var game_data = [[null, { x:-1, y:1, z:0, value:32, offset:375}, { x:0, y:1, z:-1, value:64, offset:225 }],
 //     [{ x:-1, y:0, z:1, value:8, offset:375 }, { x:0, y:0, z:0, value:16, offset:225 }, { x:1, y:0, z:-1, value:32, offset:75 }],
 //     [{ x:0, y:-1, z:1, value:0, offset:225 }, { x:1, y:-1, z:0, value:8, offset:75 }, null]];
 
-var game_data = [[null, { x:-1, y:1, z:0, value:2, offset:375}, { x:0, y:1, z:-1, value:8, offset:225 }],
-    [{ x:-1, y:0, z:1, value:4, offset:375 }, { x:0, y:0, z:0, value:2, offset:225 }, { x:1, y:0, z:-1, value:4, offset:75 }],
-    [{ x:0, y:-1, z:1, value:2, offset:225 }, { x:1, y:-1, z:0, value:2, offset:75 }, null]];
+// var game_data = [[null, { x:-1, y:1, z:0, value:16, offset:375}, { x:0, y:1, z:-1, value:4, offset:225 }],
+// [{ x:-1, y:0, z:1, value:2, offset:375 }, { x:0, y:0, z:0, value:32, offset:225 }, { x:1, y:0, z:-1, value:16, offset:75 }],
+// [{ x:0, y:-1, z:1, value:8, offset:225 }, { x:1, y:-1, z:0, value:2, offset:75 }, null]];
 
 var colors = [];
 colors.v0 = "#FFFFFF";
@@ -114,16 +114,16 @@ function game_over_check() {
     let game_over_is = true;
     for (let y = 0; y < 3; y++) {
         for (let x = 0; x < 3; x++) {
-            let item = game_data[y][x];
-            if (item != null) {
-                if (item.value > 0) {
-                    for (let i = -1; i <= 1; i++) {
-                        for (let j = -1; j <= 1; j++) {
-                            if ((i != 0 || j != 0)
-                                && y + i >= 0 && y + i <= 2 && x + j >= 0 && x + j <= 2 
-                                && game_data[y + i][x + j] != null
-                                && game_data[y][x].value == game_data[y + i][x + j].value) {
+            let cell = game_data[y][x];
+            if (cell != null) {
+                if (cell.value > 0) {
+                    for (let i = 0; i < 3; i++) {
+                        for (let j = 0; j < 3; j++) {
+                            if (i != y || j != x) {
+                                let neighbor = game_data[i][j];
+                                if (neighbor != null && cell.value == neighbor.value && (Math.abs(cell.x - neighbor.x) + Math.abs(cell.y - neighbor.y) + Math.abs(cell.z - neighbor.z))/2 == 1) {
                                     game_over_is = false;
+                                }
                             }
                         }
                     }
@@ -240,6 +240,14 @@ $(function(){
     changeStatus(0); 
 
     changeStatus(1); // for selftest - remove for realese
+    for (let i = 0; i < 3; i++){
+        for (let j = 0; j < 3; j++){
+            let data_item = game_data[i][j];
+            if (data_item != null) {
+                cell_update(game_data[i][j]);
+            }
+        }
+    }
     game_over_check();
 
     center_game();
