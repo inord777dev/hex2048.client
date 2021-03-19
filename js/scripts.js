@@ -1,8 +1,8 @@
-var game_status; //0 - stop; 1 - gaming; -1 - game-over; -2 - server-fail;  -3 - pause for POST;
+var game_status = 1; //0 - stop; 1 - gaming; -1 - game-over; -2 - server-fail;  -3 - pause for POST;
 
-var game_data = [[null, { x:-1, y:1, z:0, value:0, offset:375}, { x:0, y:1, z:-1, value:0, offset:225 }],
-    [{ x:-1, y:0, z:1, value:0, offset:375 }, { x:0, y:0, z:0, value:0, offset:225 }, { x:1, y:0, z:-1, value:0, offset:75 }],
-    [{ x:0, y:-1, z:1, value:0, offset:225 }, { x:1, y:-1, z:0, value:0, offset:75 }, null]];
+var game_data = [[null, { x:-1, y:1, z:0, value:0, offset:375}, { x:0, y:1, z:-1, value:2, offset:225 }],
+    [{ x:-1, y:0, z:1, value:0, offset:375 }, { x:0, y:0, z:0, value:2, offset:225 }, { x:1, y:0, z:-1, value:0, offset:75 }],
+    [{ x:0, y:-1, z:1, value:2, offset:225 }, { x:1, y:-1, z:0, value:0, offset:75 }, null]];
 
 function changeStatus(status) {
     game_status = status;
@@ -67,8 +67,8 @@ function start_game(){
 
 function game_calc_up(dif) {
     let hasChanges = false;
-    for (let x = 0; x < 3; x++) {
-        for (let y = 0; y < 3; y++) {
+    for (let y = 0; y < 3; y++) {
+        for (let x = 0; x < 3; x++) {
             hasChanges = game_value_calc(x, y, dif) || hasChanges;
         }
     }
@@ -79,8 +79,8 @@ function game_calc_up(dif) {
 
 function game_calc_down(dif) {
     let hasChanges = false;
-    for (let x = 2; x >= 0; x--) {
-        for (let y = 2; y >= 0; y--) {
+    for (let y = 2; y >= 0; y--) {
+        for (let x = 2; x >= 0; x--) {
             hasChanges = game_value_calc(x, y, dif) || hasChanges;
         }
     }
@@ -90,17 +90,17 @@ function game_calc_down(dif) {
 }
 
 function game_value_calc(x, y, dif) {
-    let cell = game_data[x][y];
+    let cell = game_data[y][x];
     let hasChange = false;
     let difX = x + dif.x;
     let difY = y + dif.y;
     if (cell != null && difX >= 0 && difX < 3 && difY >= 0 && difY < 3){
-        let cell_next = game_data[difX][difY];
+        let cell_next = game_data[difY][difX];
         if (cell.value == 0 && cell_next != null && cell_next.value > 0) {
             cell.value = cell_next.value;
             cell_next.value = 0;
             hasChange = true;
-        } else if (cell_next != null && cell.value == cell_next.value) {
+        } else if (cell.value > 0 && cell_next != null && cell.value == cell_next.value) {
             cell.value += cell_next.value;
             cell_next.value = 0;
             hasChange = true;
@@ -125,6 +125,7 @@ function center_game(){
                 .offset(function(i,val){
                     return { top:val.top, left:width - cell.offset + 260/2 };
                 })
+                cell_update(cell);
             }
         }
     }
@@ -151,9 +152,11 @@ function draw_hex() {
 }
 
 $(function(){
-    changeStatus(0);
+    //changeStatus(0);
+    changeStatus(1);
 
     center_game();
+    
     $(window).resize(function() {
         center_game();
     });
@@ -172,7 +175,7 @@ $(function(){
             switch (e.keyCode) {
                 case 81 : {
                     console.log("q");
-                    game_calc_up({ x:0, y:-1 });
+                    game_calc_up({ x:0, y:1 });
                     break;
                 }
                 case 87 : {
@@ -187,7 +190,7 @@ $(function(){
                 }
                 case 65 : {
                     console.log("a");
-                    game_calc_up({ x:0, y:-1 });
+                    game_calc_up({ x:1, y:0 });
                     break;
                 }
                 case 83 : {
@@ -197,7 +200,7 @@ $(function(){
                 }
                 case 68 : {
                     console.log("d");
-                    game_calc_down({ x:-1, y:0 });
+                    game_calc_down({ x:0, y:-1 });
                     break;
                 }
             }
