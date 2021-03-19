@@ -5,14 +5,6 @@ var you_are_win = false;
      [{ x:-1, y:0, z:1, value:0, offset:375 }, { x:0, y:0, z:0, value:0, offset:225 }, { x:1, y:0, z:-1, value:0, offset:75 }],
      [{ x:0, y:-1, z:1, value:0, offset:225 }, { x:1, y:-1, z:0, value:0, offset:75 }, null]];
 
-// var game_data = [[null, { x:-1, y:1, z:0, value:32, offset:375}, { x:0, y:1, z:-1, value:64, offset:225 }],
-//     [{ x:-1, y:0, z:1, value:8, offset:375 }, { x:0, y:0, z:0, value:16, offset:225 }, { x:1, y:0, z:-1, value:32, offset:75 }],
-//     [{ x:0, y:-1, z:1, value:0, offset:225 }, { x:1, y:-1, z:0, value:8, offset:75 }, null]];
-
-// var game_data = [[null, { x:-1, y:1, z:0, value:16, offset:375}, { x:0, y:1, z:-1, value:4, offset:225 }],
-// [{ x:-1, y:0, z:1, value:2, offset:375 }, { x:0, y:0, z:0, value:32, offset:225 }, { x:1, y:0, z:-1, value:16, offset:75 }],
-// [{ x:0, y:-1, z:1, value:8, offset:225 }, { x:1, y:-1, z:0, value:2, offset:75 }, null]];
-
 var colors = [];
 colors.v0 = "#FFFFFF";
 colors.v2 = "#ECE4DB";
@@ -140,7 +132,7 @@ function game_over_check() {
     }
 }
 
-function game_calc_up(dif) {
+function game_calc_down(dif) {
     changeStatus(-3);
     let hasChanges = false;
     for (let y = 0; y < 3; y++) {
@@ -155,7 +147,7 @@ function game_calc_up(dif) {
     }
 }
 
-function game_calc_down(dif) {
+function game_calc_up(dif) {
     changeStatus(-3);
     let hasChanges = false;
     for (let y = 2; y >= 0; y--) {
@@ -239,7 +231,7 @@ function draw_hex() {
 $(function(){
     changeStatus(0); 
 
-    // changeStatus(1); // for selftest - remove for realese
+    // changeStatus(1); // for selftest - not for realise
     // for (let i = 0; i < 3; i++){
     //     for (let j = 0; j < 3; j++){
     //         let data_item = game_data[i][j];
@@ -248,7 +240,6 @@ $(function(){
     //         }
     //     }
     // }
-
 
     center_game();
     
