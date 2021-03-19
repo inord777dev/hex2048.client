@@ -36,14 +36,14 @@ function changeStatus(status) {
     };
     if (value){
         el.text(value);
-        el.data("status", value);
+        el.attr("data-status", value);
     }
     console.log(status);
 }
 
 function cell_update(cell) {
     let div = $(`[data-x=${cell.x}][data-y=${cell.y}][data-z=${cell.z}]`);
-    div.data("value", cell.value);
+    div.attr("data-value", cell.value);
     div.find(".span_hex").text(cell.value === 0 ? "" : cell.value);
     div.find("polygon").attr("fill", colors["v" + cell.value]);
 }
@@ -291,6 +291,7 @@ $(function(){
 
     var hash = document.URL.substr(document.URL.indexOf('#') + 1) 
     if (hash === "test2"){
+        $("#localhost").prop("selected", true);
         start_game();   
     } else {
         center_game();
