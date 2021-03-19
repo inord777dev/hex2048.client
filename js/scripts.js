@@ -1,8 +1,31 @@
-var game_status; //0 - stop; 1 - gaming; -1 - game-over; -2 - server-fail;  -3 - pause for POST;
+var game_status; //0 - stop; 1 - gaming; -1 - game-over; -2 - server-fail;  -3 - pause for POST; -4 - win
+var you_are_win = false;
 
-var game_data = [[null, { x:-1, y:1, z:0, value:0, offset:375}, { x:0, y:1, z:-1, value:0, offset:225 }],
-    [{ x:-1, y:0, z:1, value:0, offset:375 }, { x:0, y:0, z:0, value:0, offset:225 }, { x:1, y:0, z:-1, value:0, offset:75 }],
-    [{ x:0, y:-1, z:1, value:0, offset:225 }, { x:1, y:-1, z:0, value:0, offset:75 }, null]];
+// var game_data = [[null, { x:-1, y:1, z:0, value:0, offset:375}, { x:0, y:1, z:-1, value:0, offset:225 }],
+//     [{ x:-1, y:0, z:1, value:0, offset:375 }, { x:0, y:0, z:0, value:0, offset:225 }, { x:1, y:0, z:-1, value:0, offset:75 }],
+//     [{ x:0, y:-1, z:1, value:0, offset:225 }, { x:1, y:-1, z:0, value:0, offset:75 }, null]];
+
+// var game_data = [[null, { x:-1, y:1, z:0, value:32, offset:375}, { x:0, y:1, z:-1, value:64, offset:225 }],
+//     [{ x:-1, y:0, z:1, value:8, offset:375 }, { x:0, y:0, z:0, value:16, offset:225 }, { x:1, y:0, z:-1, value:32, offset:75 }],
+//     [{ x:0, y:-1, z:1, value:0, offset:225 }, { x:1, y:-1, z:0, value:8, offset:75 }, null]];
+
+var game_data = [[null, { x:-1, y:1, z:0, value:2, offset:375}, { x:0, y:1, z:-1, value:8, offset:225 }],
+    [{ x:-1, y:0, z:1, value:4, offset:375 }, { x:0, y:0, z:0, value:2, offset:225 }, { x:1, y:0, z:-1, value:4, offset:75 }],
+    [{ x:0, y:-1, z:1, value:2, offset:225 }, { x:1, y:-1, z:0, value:2, offset:75 }, null]];
+
+var colors = [];
+colors.v0 = "#FFFFFF";
+colors.v2 = "#ECE4DB";
+colors.v4 = "#EBE0CA";
+colors.v8 = "#E9B381";
+colors.v16 = "#E8996C";
+colors.v32 = "#E78267";
+colors.v64 = "#E56747";
+colors.v128 = "#E8CF7F";
+colors.v256 = "#E8CC72";
+colors.v512 = "#E7C865";
+colors.v1024 = "#E7C559";
+colors.v2048 = "#E7C24F";
 
 function changeStatus(status) {
     game_status = status;
@@ -14,25 +37,29 @@ function changeStatus(status) {
         value = "playing";
     } else if (status == -1) {
         value = "game-over";
+    } else if (status == -4){
+        value = "you are champion!";
     };
     if (value){
         el.text(value);
         el.data("status", value);
     }
+    console.log(status);
 }
 
 function cell_update(cell) {
     let div = $(`[data-x=${cell.x}][data-y=${cell.y}][data-z=${cell.z}]`);
     div.data("value", cell.value);
     div.find(".span_hex").text(cell.value === 0 ? "" : cell.value);
+    div.find("polygon").attr("fill", colors["v" + cell.value]);
 }
 
 function game_request() {
     changeStatus(-3);
     let data = [];
 
-    for (let i = 0; i < 3; i++){
-        for (let j = 0; j < 3; j++){
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
             let item = game_data[i][j];
             if (item != null && item.value > 0) {
                 data.push(item);
@@ -48,17 +75,17 @@ function game_request() {
         data: JSON.stringify(data),
         success: function(response) {
             response.forEach(el => {
-                for (let i = 0; i < 3; i++){
-                    for (let j = 0; j < 3; j++){
+                for (let i = 0; i < 3; i++) {
+                    for (let j = 0; j < 3; j++) {
                         let game_data_item = game_data[i][j];
-                        if (game_data_item != null && game_data_item.x == el.x && game_data_item.y == el.y && game_data_item.z == el.z){
+                        if (game_data_item != null && game_data_item.x == el.x && game_data_item.y == el.y && game_data_item.z == el.z) {
                             game_data_item.value = el.value;
                         }
                     }
                 }
                 cell_update(el);
             });
-            changeStatus(1);
+            game_over_check();
         },
         error: function(xhr, ajaxOptions, thrownError) {
             changeStatus(-2);
@@ -83,6 +110,36 @@ function start_game(){
     game_request();
 }
 
+function game_over_check() {
+    let game_over_is = true;
+    for (let y = 0; y < 3; y++) {
+        for (let x = 0; x < 3; x++) {
+            let item = game_data[y][x];
+            if (item != null) {
+                if (item.value > 0) {
+                    for (let i = -1; i <= 1; i++) {
+                        for (let j = -1; j <= 1; j++) {
+                            if ((i != 0 || j != 0)
+                                && y + i >= 0 && y + i <= 2 && x + j >= 0 && x + j <= 2 
+                                && game_data[y + i][x + j] != null
+                                && game_data[y][x].value == game_data[y + i][x + j].value) {
+                                    game_over_is = false;
+                            }
+                        }
+                    }
+                } else {
+                    game_over_is = false;
+                }
+            }
+        }
+    }
+    if (game_over_is) {
+        changeStatus(-1);
+    } else {
+        changeStatus(1);
+    }
+}
+
 function game_calc_up(dif) {
     changeStatus(-3);
     let hasChanges = false;
@@ -91,13 +148,11 @@ function game_calc_up(dif) {
             hasChanges = game_value_calc(x, y, dif) || hasChanges;
         }
     }
-    game_request();
-    if (!hasChanges && game_data.every(el => el.value > 0 )) {
-        changeStatus(-1);
+    if (hasChanges) {
+        game_request();    
     } else {
         changeStatus(1);
     }
-
 }
 
 function game_calc_down(dif) {
@@ -108,9 +163,8 @@ function game_calc_down(dif) {
             hasChanges = game_value_calc(x, y, dif) || hasChanges;
         }
     }
-    game_request();
-    if (!hasChanges && game_data.every(el => el.value > 0 )) {
-        changeStatus(-1);
+    if (hasChanges) {
+        game_request();    
     } else {
         changeStatus(1);
     }
@@ -121,7 +175,7 @@ function game_value_calc(x, y, dif) {
     let hasChange = false;
     let difX = x + dif.x;
     let difY = y + dif.y;
-    if (cell != null && difX >= 0 && difX < 3 && difY >= 0 && difY < 3){
+    if (cell != null && difX >= 0 && difX <= 2 && difY >= 0 && difY <= 2){
         let cell_next = game_data[difY][difX];
         if (cell.value == 0 && cell_next != null && cell_next.value > 0) {
             cell.value = cell_next.value;
@@ -130,6 +184,9 @@ function game_value_calc(x, y, dif) {
             game_value_calc(difX, difY, dif);
         } else if (cell.value > 0 && cell_next != null && cell.value == cell_next.value) {
             cell.value += cell_next.value;
+            if (cell.value >= 2048) {
+                you_are_win = true;
+            }
             cell_next.value = 0;
             hasChange = true;
             game_value_calc(difX, difY, dif);
@@ -143,7 +200,6 @@ function game_value_calc(x, y, dif) {
 }
 
 function center_game(){
-    //var position = [{x:375, y:138},{x:375, y:314},{x:225, y:400},{x:75, y:314},{x:75, y:138}];
     let width = $(window).width()/2;
     let offset = $("#game").offset();
     for (let x = 0; x < 3; x++){
@@ -184,6 +240,7 @@ $(function(){
     changeStatus(0); 
 
     changeStatus(1); // for selftest - remove for realese
+    game_over_check();
 
     center_game();
     
